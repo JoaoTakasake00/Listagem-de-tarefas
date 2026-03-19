@@ -2,6 +2,17 @@
 
 Aplicação full stack para gerenciamento de tarefas com backend em PHP, autenticação JWT, frontend modular ES6, Docker e testes de integração.
 
+## Descrição do projeto
+
+O TaskFlow é uma aplicação de lista de tarefas com autenticação baseada em JWT, operações CRUD protegidas por token, validação de dados no backend e frontend, além de monitoramento via endpoint de healthcheck.
+
+Principais recursos:
+- Login com JWT (`POST /auth/login`)
+- CRUD de tarefas autenticado (`POST`, `PUT`, `DELETE /tasks`)
+- Listagem pública de tarefas (`GET /tasks`)
+- Healthcheck operacional (`GET /health` e `GET /api/health`)
+- Frontend em módulos ES6 e interface responsiva com Bootstrap
+
 ## Demonstração (Fluxo completo)
 
 1. Suba a aplicação com Docker.
@@ -41,6 +52,27 @@ docker compose up -d --build
 4. Abra no navegador:
 - Frontend: `http://localhost:9000/public/`
 - API: `http://localhost:9000/`
+
+## Rodando com Docker
+
+1. Garanta que Docker Desktop esteja em execução.
+2. Suba os serviços:
+
+```bash
+docker compose up -d --build
+```
+
+3. Verifique containers ativos:
+
+```bash
+docker compose ps
+```
+
+4. Para encerrar o ambiente:
+
+```bash
+docker compose down
+```
 
 ## Variáveis de Ambiente
 
@@ -117,6 +149,8 @@ curl http://localhost:9000/health
 ```
 
 ## Testes
+
+As instruções abaixo cobrem os testes aplicáveis no projeto atualmente.
 
 ### Unitários (sanidade estática / sintaxe)
 
