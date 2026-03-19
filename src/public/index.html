@@ -3,44 +3,190 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Lista de Tarefas</title>
+  <title>TaskFlow | Lista de Tarefas</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
-<body class="bg-dark text-white">
-<div class="container-fluid container-md mt-4 mt-md-5 px-3 px-md-0">
-  <h2 class="mb-4 text-center text-md-start">Lista de Tarefas</h2>
-  <div id="feedback" class="alert d-none" role="alert"></div>
-  <div class="card p-3 mb-4 text-dark">
-    <form id="taskForm" novalidate>
-      <input type="hidden" id="taskId">
-      <input type="text" id="title" class="form-control mb-2" placeholder="Título" maxlength="120" required>
-      <textarea id="description" class="form-control mb-2" placeholder="Descrição" rows="3" maxlength="1000"></textarea>
-      <select id="status" class="form-select mb-3" required>
-        <option value="pendente">Pendente</option>
-        <option value="em andamento">Em andamento</option>
-        <option value="concluída">Concluída</option>
-      </select>
-      <div class="d-flex flex-column flex-md-row gap-2">
-        <button type="submit" id="btnSubmit" class="btn btn-primary w-100">Criar</button>
-        <button type="button" id="btnCancel" class="btn btn-secondary w-100">Cancelar</button>
+<body>
+<div class="layout-overlay"></div>
+<main class="container py-4 py-md-5">
+  <section class="hero-card mb-4 mb-md-5">
+    <div class="row g-3 align-items-center">
+      <div class="col-12 col-lg-7">
+        <h1 class="hero-title mb-2">Organize suas tarefas com clareza</h1>
+        <p class="hero-subtitle mb-0">Crie, acompanhe status e mantenha seu fluxo de trabalho produtivo.</p>
       </div>
-    </form>
+      <div class="col-12 col-lg-5">
+        <div class="row g-2 stats-grid">
+          <div class="col-4">
+            <div class="stat-pill">
+              <span class="stat-label">Total</span>
+              <strong id="totalCount" class="stat-value">0</strong>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="stat-pill">
+              <span class="stat-label">Pendentes</span>
+              <strong id="pendingCount" class="stat-value">0</strong>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="stat-pill">
+              <span class="stat-label">Concluídas</span>
+              <strong id="doneCount" class="stat-value">0</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="feedback" class="alert d-none feedback-alert shadow-sm" role="alert"></div>
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-3">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+          <h2 class="section-title mb-1">Status da sessão</h2>
+          <p class="section-subtitle mb-0">Faça login para criar, editar e excluir tarefas.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <span id="authStatusBadge" class="badge text-bg-secondary px-3 py-2">Desconectado</span>
+          <button type="button" id="btnOpenLoginModal" class="btn btn-dark btn-sm px-3">Logar</button>
+          <button type="button" id="btnLogout" class="btn btn-outline-danger btn-sm">Sair</button>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="card p-3 text-dark">
-    <div class="table-responsive">
-      <table class="table table-hover w-100 text-nowrap">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Título</th>
-            <th>Descrição</th>
-            <th>Status</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody id="tasksTable"></tbody>
-      </table>
+
+  <div class="row g-4">
+    <div class="col-12 col-xl-4">
+      <div class="card form-card border-0 shadow-lg h-100">
+        <div class="card-body p-4">
+          <h2 class="section-title mb-1">Nova tarefa</h2>
+          <p class="section-subtitle mb-4">Adicione uma atividade para o seu dia.</p>
+          <form id="taskForm" novalidate>
+            <div class="mb-3">
+              <label for="title" class="form-label">Título</label>
+              <input type="text" id="title" class="form-control" placeholder="Ex.: Revisar apresentação" maxlength="120" required>
+            </div>
+            <div class="mb-3">
+              <label for="description" class="form-label">Descrição</label>
+              <textarea id="description" class="form-control" placeholder="Detalhes importantes da tarefa" rows="4" maxlength="1000"></textarea>
+            </div>
+            <div class="mb-4">
+              <label for="status" class="form-label">Status inicial</label>
+              <select id="status" class="form-select" required>
+                <option value="pendente">Pendente</option>
+                <option value="em andamento">Em andamento</option>
+                <option value="concluido">Concluído</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="createdAt" class="form-label">Data de criação</label>
+              <input type="date" id="createdAt" class="form-control" required>
+            </div>
+            <div class="d-grid gap-2 mt-4">
+              <button type="submit" id="btnSubmit" class="btn btn-primary btn-lg">Criar tarefa</button>
+              <button type="button" id="btnCancel" class="btn btn-outline-secondary">Limpar formulário</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-xl-8">
+      <div class="card table-card border-0 shadow-lg">
+        <div class="card-body p-4">
+          <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2 mb-3">
+            <div>
+              <h2 class="section-title mb-1">Tarefas cadastradas</h2>
+              <p class="section-subtitle mb-0">Edite, altere o status ou remova itens da lista.</p>
+            </div>
+            <span id="activeCountBadge" class="badge text-bg-light px-3 py-2 fw-semibold">0 em andamento</span>
+          </div>
+          <div class="table-responsive-md tasks-table-wrapper">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Título</th>
+                  <th>Descrição</th>
+                  <th>Status</th>
+                  <th>Criação</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tasksTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header">
+        <h5 class="modal-title">Login</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <form id="loginModalForm" novalidate>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="modalUsername" class="form-label">Usuário</label>
+            <input type="text" id="modalUsername" class="form-control" placeholder="admin" maxlength="64" required>
+          </div>
+          <div class="mb-2">
+            <label for="modalPassword" class="form-label">Senha</label>
+            <input type="password" id="modalPassword" class="form-control" placeholder="******" maxlength="128" required>
+          </div>
+          <div id="loginModalFeedback" class="alert d-none mt-3 mb-0 py-2" role="alert"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary px-4">Logar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="editTaskModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar tarefa</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <form id="editTaskForm" novalidate>
+        <div class="modal-body">
+          <input type="hidden" id="editTaskId">
+          <div class="mb-3">
+            <label for="editTitle" class="form-label">Título</label>
+            <input type="text" id="editTitle" class="form-control" placeholder="Título" maxlength="120" required>
+          </div>
+          <div class="mb-3">
+            <label for="editDescription" class="form-label">Descrição</label>
+            <textarea id="editDescription" class="form-control" placeholder="Descrição" rows="4" maxlength="1000"></textarea>
+          </div>
+          <div>
+            <label for="editStatus" class="form-label">Status</label>
+            <select id="editStatus" class="form-select" required>
+              <option value="pendente">Pendente</option>
+              <option value="em andamento">Em andamento</option>
+              <option value="concluido">Concluído</option>
+            </select>
+          </div>
+          <div class="mt-3">
+            <label for="editCreatedAt" class="form-label">Data de criação</label>
+            <input type="date" id="editCreatedAt" class="form-control" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary px-4">Salvar alterações</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

@@ -1,12 +1,22 @@
+import { applyAuthHeader, clearSession } from "./auth.js";
 const API_BASE = "http://localhost:9000";
 const TASKS_ENDPOINT = `${API_BASE}/tasks`;
 
-async function request(url, options = {}) {
-  const response = await fetch(url, options);
+async function request(url, options = {}, requiresAuth = false) {
+  const headers = requiresAuth
+    ? applyAuthHeader(options.headers || {})
+    : (options.headers || {});
+
+  const response = await fetch(url, { ...options, headers });
   const hasBody = response.status !== 204;
   const json = hasBody ? await response.json().catch(() => ({})) : null;
 
   if (!response.ok) {
+    if (response.status === 401 && requiresAuth) {
+      clearSession();
+      window.dispatchEvent(new CustomEvent("auth:required"));
+    }
+
     const message = json?.error || "Erro na requisição da API.";
     throw new Error(message);
   }
@@ -23,7 +33,7 @@ export async function createTaskAPI(data) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
-  });
+  }, true);
 }
 
 export async function updateTaskAPI(id, data) {
@@ -31,11 +41,11 @@ export async function updateTaskAPI(id, data) {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
-  });
+  }, true);
 }
 
 export async function deleteTaskAPI(id) {
   return request(`${TASKS_ENDPOINT}/${id}`, {
     method: "DELETE"
-  });
+  }, true);
 }

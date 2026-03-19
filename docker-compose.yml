@@ -15,6 +15,15 @@ services:
       DB_NAME: tasks_db
       DB_USER: user
       DB_PASSWORD: user
+      AUTH_USERNAME: admin
+      AUTH_PASSWORD_HASH: "$$2y$$10$$aXO7Z.XEEzJB18qDuj74JOsqNjlhBHaZDArI196q/XItqhcfjsOK6"
+      AUTH_SECRET: "taskflow_auth_secret_change_me"
+      TOKEN_EXPIRY: 3600
+      REFRESH_TOKEN_SECRET: "taskflow_refresh_secret_change_me"
+      JWT_SECRET: "taskflow_jwt_secret_2026_change_me"
+      JWT_ALGORITHM: HS256
+      JWT_ISSUER: taskflow-api
+      JWT_EXPIRES_IN: 3600
     depends_on:
       db:
         condition: service_healthy

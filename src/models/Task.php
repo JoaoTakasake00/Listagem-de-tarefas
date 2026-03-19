@@ -14,13 +14,14 @@ final class TaskRepository
     public function create(array $task): int
     {
         $statement = $this->pdo->prepare(
-            'INSERT INTO tasks (title, description, status) VALUES (:title, :description, :status)'
+            'INSERT INTO tasks (title, description, status, created_at) VALUES (:title, :description, :status, :created_at)'
         );
 
         $statement->execute([
             'title' => $task['title'],
             'description' => $task['description'],
             'status' => $task['status'],
+            'created_at' => $task['created_at'],
         ]);
 
         return (int) $this->pdo->lastInsertId();
@@ -49,7 +50,7 @@ final class TaskRepository
     public function update(int $id, array $task): bool
     {
         $statement = $this->pdo->prepare(
-            'UPDATE tasks SET title = :title, description = :description, status = :status, updated_at = CURRENT_TIMESTAMP WHERE id = :id'
+            'UPDATE tasks SET title = :title, description = :description, status = :status, created_at = :created_at, updated_at = CURRENT_TIMESTAMP WHERE id = :id'
         );
 
         $statement->execute([
@@ -57,6 +58,7 @@ final class TaskRepository
             'title' => $task['title'],
             'description' => $task['description'],
             'status' => $task['status'],
+            'created_at' => $task['created_at'],
         ]);
 
         return $statement->rowCount() > 0;

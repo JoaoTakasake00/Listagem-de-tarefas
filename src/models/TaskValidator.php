@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 final class TaskValidator
 {
-    private const VALID_STATUSES = ['pendente', 'em andamento', 'concluída'];
+    private const VALID_STATUSES = ['pendente', 'em andamento', 'concluido'];
 
     public function validateCreatePayload(array $data): array
     {
@@ -20,7 +20,9 @@ final class TaskValidator
     {
         $title = isset($data['title']) ? trim((string) $data['title']) : '';
         $description = isset($data['description']) ? trim((string) $data['description']) : '';
-        $status = isset($data['status']) ? trim((string) $data['status']) : 'pendente';
+        $rawStatus = isset($data['status']) ? trim((string) $data['status']) : 'pendente';
+        $status = $this->normalizeStatus($rawStatus);
+        $createdAt = isset($data['created_at']) ? trim((string) $data['created_at']) : '';
 
         if ($title === '') {
             throw new InvalidArgumentException('Título é obrigatório.');
@@ -38,12 +40,53 @@ final class TaskValidator
             throw new InvalidArgumentException('Status inválido.');
         }
 
+        if (!$this->isValidDate($createdAt)) {
+            throw new InvalidArgumentException('Data de criação inválida. Use o formato YYYY-MM-DD.');
+        }
+
         $sanitizedTask = [
             'title' => strip_tags($title),
             'description' => strip_tags($description),
             'status' => $status,
+            'created_at' => $createdAt,
         ];
 
         return $sanitizedTask;
+    }
+
+    private function isValidDate(string $value): bool
+    {
+        if ($value === '') {
+            return false;
+        }
+
+        $date = DateTime::createFromFormat('Y-m-d', $value);
+
+        return $date !== false && $date->format('Y-m-d') === $value;
+    }
+
+    private function normalizeStatus(string $status): string
+    {
+        $normalized = mb_strtolower(trim($status), 'UTF-8');
+        $normalized = strtr($normalized, [
+            'á' => 'a',
+            'à' => 'a',
+            'â' => 'a',
+            'ã' => 'a',
+            'é' => 'e',
+            'ê' => 'e',
+            'í' => 'i',
+            'ó' => 'o',
+            'ô' => 'o',
+            'õ' => 'o',
+            'ú' => 'u',
+            'ç' => 'c',
+        ]);
+
+        if ($normalized === 'concluida') {
+            return 'concluido';
+        }
+
+        return $normalized;
     }
 }
