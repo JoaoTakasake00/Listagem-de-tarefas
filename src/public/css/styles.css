@@ -1,0 +1,32 @@
+table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+th, td {
+  text-align: center;
+  padding: 16px;
+  vertical-align: middle;
+}
+
+.status-btn {
+  width: 100%;
+  max-width: 160px;
+  min-width: 120px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.dropdown-menu {
+  z-index: 9999;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.description-cell {
+  white-space: normal;
+  word-break: break-word;
+}
