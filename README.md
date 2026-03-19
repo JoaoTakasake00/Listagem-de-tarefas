@@ -74,6 +74,60 @@ docker compose ps
 docker compose down
 ```
 
+## Banco de Dados (MySQL)
+
+Neste projeto, a tabela `tasks` é criada automaticamente no MySQL via script de inicialização:
+
+- Arquivo: `docker/mysql/init.sql`
+- Mapeamento no compose: `./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro`
+
+### Como visualizar via terminal (PowerShell)
+
+1. Verifique se os containers estão ativos:
+
+```bash
+docker compose ps
+```
+
+2. Liste os bancos:
+
+```bash
+docker exec -it mysql_db mysql -uuser -puser -e "SHOW DATABASES;"
+```
+
+3. Liste as tabelas do banco da aplicação:
+
+```bash
+docker exec -it mysql_db mysql -uuser -puser -e "USE tasks_db; SHOW TABLES;"
+```
+
+4. Consulte os dados da tabela `tasks`:
+
+```bash
+docker exec -it mysql_db mysql -uuser -puser -e "USE tasks_db; SELECT * FROM tasks;"
+```
+
+### Como visualizar com interface gráfica (DBeaver / MySQL Workbench)
+
+Use os dados de conexão abaixo:
+
+- Host: `localhost`
+- Porta: `3307`
+- Database: `tasks_db`
+- Usuário: `user`
+- Senha: `user`
+
+### Observação sobre criação automática
+
+O volume `db_data` mantém os dados persistidos. Por isso, o script de inicialização roda na criação inicial do banco.
+
+Se quiser recriar o banco do zero:
+
+```bash
+docker compose down -v
+docker compose up -d --build
+```
+
 ## Variáveis de Ambiente
 
 Veja todas as variáveis em [.env.example](file:///d:/PROJETOS/TESTES%20PARA%20TRABALHO/lista-de-tarefas/.env.example).
